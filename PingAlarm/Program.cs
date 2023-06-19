@@ -1,8 +1,15 @@
+using NLog.Extensions.Logging;
 using PingAlarm;
 
-IHost host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureLogging((hostContext, logging) =>
+    {
+        logging.ClearProviders();
+        logging.AddNLog();
+    })
     .ConfigureServices(services =>
     {
+        services.AddSingleton<PingConfig>();
         services.AddHostedService<PingWorker>();
     })
     .Build();

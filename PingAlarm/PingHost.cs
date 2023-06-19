@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace PingAlarm
 {
-    internal class Host
+    public class PingHost
     {
         public string IPNumber { get; set; } = string.Empty;
 
-        public bool HasFailed { get; set; } = false;
+        public int Failures { get; set; } = 0;
     }
 }
