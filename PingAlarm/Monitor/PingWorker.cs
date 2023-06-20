@@ -80,7 +80,7 @@ namespace PingAlarm.Monitor
 
         private string GetFailedHosts()
         {
-            var failed = _pingConfig.Hosts.Where(h => h.Failures >= _pingConfig.MinimumFailures).Select(h => h.IPNumber);
+            var failed = _pingConfig.Hosts.Where(h => h.Failures >= _pingConfig.MinimumFailures).Select(h => h.Name);
 
             return String.Join(',', failed);
         }
