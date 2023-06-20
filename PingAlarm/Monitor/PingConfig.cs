@@ -5,28 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PingAlarm
+namespace PingAlarm.Monitor
 {
     public class PingConfig
     {
 
-        public PingConfig(IConfiguration configuration) {
+        public PingConfig(IConfiguration configuration)
+        {
 
-            var config = configuration.GetSection("Config");
+            var config = configuration.GetSection("PingHost");
             Timeout = config.GetValue<int>("Timeout");
             Sleep = config.GetValue<int>("Sleep");
             Hosts = config.GetSection("Hosts").Get<List<PingHost>>();
         }
 
-        public int Timeout { get; set; }
+        public int Timeout { get; }
 
-        public int Sleep { get; set; } = 2000;
+        public int Sleep { get; } = 2000;
 
-        public int MinimumFailures { get; set; } = 2;
-
-        public bool AlarmSent { get; set; } = false;   
-
-
+        public int MinimumFailures { get; } = 2;
 
         public List<PingHost> Hosts { get; set; }
 

@@ -1,5 +1,6 @@
 using NLog.Extensions.Logging;
-using PingAlarm;
+using PingAlarm.Alarms;
+using PingAlarm.Monitor;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureLogging((hostContext, logging) =>
@@ -10,6 +11,8 @@ var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
         services.AddSingleton<PingConfig>();
+        services.AddSingleton<TwillioConfig>();
+        services.AddSingleton<TwillioAlarm>();
         services.AddHostedService<PingWorker>();
     })
     .Build();
