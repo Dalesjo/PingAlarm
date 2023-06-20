@@ -263,3 +263,4 @@ __pycache__/
 # This holds the final container images.
 /images
 .sonarqube
+/PingAlarm/appsettings.Development.json
