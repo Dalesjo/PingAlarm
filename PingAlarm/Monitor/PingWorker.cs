@@ -13,13 +13,16 @@ namespace PingAlarm.Monitor
         private bool AlarmSent = false;
         private PingConfig _pingConfig;
         private TwillioAlarm _twillioAlarm;
+        private GpioStatus _gpioStatus;
 
         public PingWorker(
             PingConfig pingConfig,
             ILogger<PingWorker> log,
-            TwillioAlarm twillioAlarm)
+            TwillioAlarm twillioAlarm,
+            GpioStatus gpioStatus)
         {
             _pingConfig = pingConfig;
+            _gpioStatus = gpioStatus;
             _log = log;
             _twillioAlarm = twillioAlarm;
 
@@ -32,6 +35,7 @@ namespace PingAlarm.Monitor
                 try
                 {
                     _log.LogDebug("Ping All");
+                    _gpioStatus.NetworkBlink();
                     await PingAllHosts();
                     await VerifyAllHosts();
                     await Task.Delay(_pingConfig.Sleep, stoppingToken);
@@ -87,7 +91,6 @@ namespace PingAlarm.Monitor
 
         private async Task PingAllHosts()
         {
-
             var allHosts = new List<Task>();
             foreach (var host in _pingConfig.Hosts)
             {

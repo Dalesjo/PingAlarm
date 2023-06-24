@@ -11,9 +11,16 @@ var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
         services.AddSingleton<PingConfig>();
+        services.AddSingleton<GpioGuardConfig>();
+        services.AddSingleton<GpioStatusConfig>();
         services.AddSingleton<TwillioConfig>();
+
         services.AddSingleton<TwillioAlarm>();
+        services.AddSingleton<GpioStatus>();
+        services.AddSingleton<Alarm>();
+
         services.AddHostedService<PingWorker>();
+        services.AddHostedService<GpioGuardWorker>();
     })
     .Build();
 

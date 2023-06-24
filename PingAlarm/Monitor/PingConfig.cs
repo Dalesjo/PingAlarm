@@ -12,7 +12,6 @@ namespace PingAlarm.Monitor
 
         public PingConfig(IConfiguration configuration)
         {
-
             var config = configuration.GetSection("Ping");
             Timeout = config.GetValue<int>("Timeout");
             Sleep = config.GetValue<int>("Sleep");
