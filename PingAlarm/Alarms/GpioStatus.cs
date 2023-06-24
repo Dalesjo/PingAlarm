@@ -19,6 +19,8 @@ namespace PingAlarm.Alarms
         private bool NetworkBlinky { get; set; } = true;
         private bool GuardBlinky { get; set; } = true;
 
+        private bool AlarmStarted { get; set; } = false;
+
         public GpioStatus(
             GpioStatusConfig gpioConfig,
             ILogger<GpioStatus> log,
@@ -50,12 +52,25 @@ namespace PingAlarm.Alarms
                 return;
             }
 
+            if(AlarmStarted)
+            {
+                _log.LogInformation("Alarm is already started, aborting");
+                return;
+            }
+
+
             var on = _gpioConfig.GuardStatus.High ? PinValue.High : PinValue.Low;
             var off = _gpioConfig.GuardStatus.High ? PinValue.Low : PinValue.High;
-
+            AlarmStarted = true;
             _gpioController.Write(_gpioConfig.GuardStatus.Pin, on);
+            _log.LogDebug("Alarm Started");
+            _log.LogDebug("Alarm will run for {AlarmTime}ms",_gpioConfig.AlarmTime);
+            
             await Task.Delay(_gpioConfig.AlarmTime, cancellationToken);
+            
             _gpioController.Write(_gpioConfig.GuardStatus.Pin, off);
+            _log.LogDebug("Alarm Stopped");
+            AlarmStarted = false;
         }
 
         public void NetworkBlink()
