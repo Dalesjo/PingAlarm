@@ -46,6 +46,7 @@ namespace PingAlarm.Monitor
         {
             if (!_gpioconfig.Enabled)
             {
+                _log.LogDebug("gpioconfig not enabled...");
                 return;
             }
 
@@ -99,6 +100,8 @@ namespace PingAlarm.Monitor
 
              var result = _gpioController.Read(gpioPin.Pin);
             //result == PinValue.High;
+
+            _log.LogDebug("Registrated {gpioPin}", gpioPin.Pin);
 
         }
 

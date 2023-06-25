@@ -95,8 +95,6 @@ namespace PingAlarm.Alarms
                 return;
             }
 
-            
-
             var on = _gpioConfig.GuardStatus.High ? PinValue.High : PinValue.Low;
             var off = _gpioConfig.GuardStatus.High ? PinValue.Low : PinValue.High;
             var set = GuardBlinky ? on : off;
