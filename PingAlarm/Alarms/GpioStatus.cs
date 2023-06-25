@@ -39,9 +39,9 @@ namespace PingAlarm.Alarms
             _gpioController = new GpioController();
             applicationLifetime.ApplicationStopping.Register(OnApplicationStopping);
 
-            _gpioController.OpenPin(_gpioConfig.Alarm.Pin);
-            _gpioController.OpenPin(_gpioConfig.NetworkStatus.Pin);
-            _gpioController.OpenPin(_gpioConfig.GuardStatus.Pin);
+            _gpioController.OpenPin(_gpioConfig.Alarm.Pin, PinMode.Output);
+            _gpioController.OpenPin(_gpioConfig.NetworkStatus.Pin, PinMode.Output);
+            _gpioController.OpenPin(_gpioConfig.GuardStatus.Pin,PinMode.Output);
         }
 
         public async Task Alarm(CancellationToken cancellationToken)
