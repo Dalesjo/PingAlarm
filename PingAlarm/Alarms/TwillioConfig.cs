@@ -17,14 +17,14 @@ namespace PingAlarm.Alarms
             Recepients = config.GetSection("Recepients").Get<List<string>>();
         }
 
-        public bool Enabled { get; }
-        public string AccountSid { get; } 
+        public bool Enabled { get; set; }
+        public string AccountSid { get; set; } 
 
-        public string AuthToken { get; }
+        public string AuthToken { get; set; }
 
-        public string PhoneNumber { get; }
-        public string Language { get; } = "sv-SE";
+        public string PhoneNumber { get; set; }
+        public string Language { get; set; } = "sv-SE";
 
-        public List<string> Recepients { get; }
+        public List<string> Recepients { get; set; }
     }
 }

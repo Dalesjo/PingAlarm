@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using PingAlarm.Monitor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,19 +16,21 @@ namespace PingAlarm.Alarms
             var section = configuration.GetSection("GpioStatus");
 
             
-            Alarm = section.GetValue<GpioOutputPin>("Alarm");
+            Alarm = section.GetSection("Alarm").Get<GpioOutputPin>();
+            
             AlarmTime = section.GetValue<int>("AlarmTime");
             Enabled = section.GetValue<bool>("Enabled");
-            NetworkStatus = section.GetValue<GpioOutputPin>("NetworkStatus");
-            GuardStatus = section.GetValue<GpioOutputPin>("GuardStatus");
+
+            NetworkStatus = section.GetSection("NetworkStatus").Get<GpioOutputPin>();
+            GuardStatus = section.GetSection("GuardStatus").Get<GpioOutputPin>();
         }
 
 
-        public int AlarmTime { get; }
-        public bool Enabled { get; }
-        public GpioOutputPin Alarm {get;}
-        public GpioOutputPin NetworkStatus { get; }
-        public GpioOutputPin GuardStatus { get; }
+        public int AlarmTime { get; set; }
+        public bool Enabled { get; set;  }
+        public GpioOutputPin Alarm { get; set; }
+        public GpioOutputPin NetworkStatus { get; set; }
+        public GpioOutputPin GuardStatus { get; set; }
     }
 
 }

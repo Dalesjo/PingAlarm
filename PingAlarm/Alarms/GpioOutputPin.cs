@@ -8,11 +8,11 @@ namespace PingAlarm.Alarms
 {
     public class GpioOutputPin
     {
-        public string Name { get; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
-        public int Pin { get; }
+        public int Pin { get; set; }
 
-        public bool High { get; }
+        public bool High { get; set; }
 
     }
 }
