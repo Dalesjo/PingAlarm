@@ -39,7 +39,7 @@ namespace PingAlarm.Alarms
             _gpioController = new GpioController();
             applicationLifetime.ApplicationStopping.Register(OnApplicationStopping);
 
-            _gpioController.OpenPin(_gpioConfig.Alarm.Pin, PinMode.);
+            _gpioController.OpenPin(_gpioConfig.Alarm.Pin, PinMode.Output);
             _gpioController.OpenPin(_gpioConfig.NetworkStatus.Pin, PinMode.Output);
             _gpioController.OpenPin(_gpioConfig.GuardStatus.Pin,PinMode.Output);
         }
@@ -60,6 +60,7 @@ namespace PingAlarm.Alarms
 
             var on = _gpioConfig.Alarm.High ? PinValue.High : PinValue.Low;
             var off = _gpioConfig.Alarm.High ? PinValue.Low : PinValue.High;
+
             AlarmStarted = true;
             _gpioController.Write(_gpioConfig.Alarm.Pin, on);
             _log.LogDebug("Alarm Started");
