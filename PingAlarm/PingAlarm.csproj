@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-PingAlarm-2382908a-e48d-4a79-b3a3-9e26e520af8c</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <Version>1.0.4</Version>
+    <Version>1.0.6</Version>
     <Authors>Samuel Dalesjö</Authors>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
@@ -19,5 +19,11 @@
     <PackageReference Include="System.Device.Gpio" Version="2.2.0" />
     <PackageReference Include="Twilio" Version="6.8.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="install.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
