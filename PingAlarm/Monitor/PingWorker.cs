@@ -12,19 +12,19 @@ namespace PingAlarm.Monitor
 
         private bool AlarmSent = false;
         private PingConfig _pingConfig;
-        private TwillioAlarm _twillioAlarm;
+        private Alarm _alarm;
         private GpioStatus _gpioStatus;
 
         public PingWorker(
             PingConfig pingConfig,
             ILogger<PingWorker> log,
-            TwillioAlarm twillioAlarm,
+            Alarm alarm,
             GpioStatus gpioStatus)
         {
             _pingConfig = pingConfig;
             _gpioStatus = gpioStatus;
             _log = log;
-            _twillioAlarm = twillioAlarm;
+            _alarm = alarm;
 
         }
 
@@ -37,7 +37,7 @@ namespace PingAlarm.Monitor
                     _log.LogDebug("Ping All");
                     _gpioStatus.NetworkBlink();
                     await PingAllHosts();
-                    await VerifyAllHosts();
+                    await VerifyAllHosts(stoppingToken);
                     await Task.Delay(_pingConfig.Sleep, stoppingToken);
                 } catch(Exception ex)
                 {
@@ -46,7 +46,7 @@ namespace PingAlarm.Monitor
             }
         }
 
-        private async Task VerifyAllHosts()
+        private async Task VerifyAllHosts(CancellationToken stoppingToken)
         {
             var failed = AnyFailedHosts();
             var failedHosts = GetFailedHosts();
@@ -55,7 +55,7 @@ namespace PingAlarm.Monitor
             {
                 _log.LogInformation("ALARM!!!!!");
                 
-                await _twillioAlarm.Alarm(failedHosts);
+                await _alarm.Start(failedHosts, stoppingToken);
 
                 AlarmSent = true;
                 return;
@@ -72,12 +72,6 @@ namespace PingAlarm.Monitor
         private bool AnyFailedHosts()
         {
             var alarm = _pingConfig.Hosts.Any(h => h.Failures >= _pingConfig.MinimumFailures);
-            var failed = _pingConfig.Hosts.Where(h => h.Failures >= _pingConfig.MinimumFailures);
-
-            foreach (var host in failed)
-            {
-                _log.LogInformation("Host Alarm: {IPNumber}", host.IPNumber);
-            }
 
             return alarm;
         }

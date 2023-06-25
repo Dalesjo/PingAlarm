@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+    <title>Alarm</title>
+    <style>
+        body {
+            background-color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            color: #eeeeee;
+            font-size: 1.4em;
+        }
+
+        h1 {
+            color: #eeeeee;
+            font-size: 1.6em;
+        }
+
+        input {
+            background-color: #eeeeee;
+        }
+
+        input,
+        button {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            border: 1px solid #333;
+            border-radius: 0.2em;
+            font-size: 1em;
+        }
+
+        input,
+        button {
+            padding: 1em;
+            margin-bottom: 1em;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        table {
+
+            width: 100%;
+            margin-bottom: 0.4em;
+            border-collapse: separate;
+            border-spacing: 0 1em;
+
+
+        }
+
+        table tr td:last-child {
+            width: 2em;
+        }
+
+        .checkmark,
+        .failure {
+            width: 1em;
+            height: 1em;
+            margin-right: 0.4em;
+        }
+
+        .checkmark {
+            fill: #28a745;
+        }
+
+        .failure {
+            fill: #dc3545;
+        }
+
+        #warning {
+            color: #ffc107;
+        }
+
+        #enable {
+            background-color: #dc3545;
+            color: #eee;
+        }
+
+        #disable {
+
+            color: #eee;
+            background-color: #28a745;
+        }
+
+        #lastUpdated {
+            margin-top: -1.2em;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="Alarm">PingAlarm</h1>
+    <form id="alarmForm">
+        <input
+            id="password"
+            type="text"
+            inputmode="tel"
+            autofocus
+            autocomplete="off"
+        />
+
+        <button
+            id="enable"
+            type="submit"
+            value="true"
+            class="hidden"
+        >
+            Enable
+        </button>
+
+        <button
+            id="disable"
+            type="submit"
+            value="false"
+            class="hidden"
+        >
+            Disable
+        </button>
+
+        <div
+            id="warning"
+            class="hidden"
+        >
+            Warning: Wrong Pin Code
+        </div>
+
+        <h1>Status (<span id="state">off</span>)</h1>
+        <div id="lastUpdated"></div>
+        <table id="PingStatus">
+
+        </table>
+
+        <table id="GpioStatus">
+
+        </table>
+    </form>
+
+    <script type="text/javascript">
+
+        var disable = document.getElementById("disable");
+        var enable = document.getElementById("enable");
+        var password = document.getElementById("password");
+        var alarmForm = document.getElementById("alarmForm");
+        var warning = document.getElementById("warning");
+        var state = document.getElementById("state");
+        var lastUpdated = document.getElementById("lastUpdated");
+
+        var pingStatus = document.getElementById("PingStatus");
+        var gpioStatus = document.getElementById("GpioStatus");
+
+        function get()
+        {
+            fetch('/api/alarm')
+                .then(response => response.json())
+                .then(result =>
+                {
+                    status(result);
+                })
+                .catch(error =>
+                {
+                    // Handle any errors that occurred during the request
+                    console.error('Error:', error);
+                });
+        }
+
+        function send(password, enabled)
+        {
+
+            let request = {
+                "Password": password,
+                "Enabled": enabled
+            };
+
+            fetch('/api/alarm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(request)
+            })
+                .then(response =>
+                {
+                    if (!response.ok)
+                    {
+                        throw new Error(response.status);
+                    }
+
+                    return response.json();
+                })
+                .then(result =>
+                {
+                    // Handle the response from the API
+                    status(result);
+                })
+                .catch(error =>
+                {
+                    // Handle any errors that occurred during the request
+                    console.log('Error:', error);
+                    warning.classList.remove("hidden");
+                });
+        }
+
+        function status(status)
+        {
+            console.log("status", status.enabled);
+            if (status.enabled)
+            {
+                console.log("disable button");
+                enable.classList.add("hidden");
+                disable.classList.remove("hidden");
+                warning.classList.add("hidden");
+                state.innerHTML = "on";
+            }
+            else 
+            {
+                console.log("enabled button");
+                enable.classList.remove("hidden");
+                disable.classList.add("hidden");
+                warning.classList.add("hidden");
+                state.innerHTML = "off";
+            }
+
+            lastUpdated.innerHTML = getTime();
+
+            updateTable(pingStatus, status.pingHostStatus);
+            updateTable(gpioStatus, status.gpioInputPinStatus);
+
+
+            document.getElementById("password").value = "";
+            //document.getElementById("password").focus();
+        }
+
+        function updateTable(table, list)
+        {
+            while (table.rows.length > 0)
+            {
+                table.deleteRow(0);
+            }
+
+            for (var i = 0; i < list.length; i++)
+            {
+                var object = list[i];
+                var name = object.name;
+                var failures = object.failures;
+
+                // Create a new row
+                var row = table.insertRow(i);
+
+                // Create cells and populate them with object data
+                var nameCell = row.insertCell(0);
+                nameCell.innerHTML = name;
+
+                var failuresCell = row.insertCell(1);
+
+                if (failures > 0)
+                {
+                    failuresCell.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="failure" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>';
+                }
+                else 
+                {
+                    failuresCell.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="checkmark" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>';
+                }
+
+
+            }
+        }
+
+        function getTime()
+        {
+            var now = new Date();
+            var hours = now.getHours().toString().padStart(2, '0');
+            var minutes = now.getMinutes().toString().padStart(2, '0');
+            var seconds = now.getSeconds().toString().padStart(2, '0');
+
+            var timeString = hours + ':' + minutes + ':' + seconds;
+            return timeString;
+        }
+
+        alarmForm.addEventListener("submit", function (e)
+        {
+            e.preventDefault();
+
+            let onOff = e.submitter.value === 'true' ? true : false;
+            var password = document.getElementById("password").value;
+
+            send(password, onOff);
+        });
+
+
+        get();
+
+
+        window.setInterval(function ()
+        {
+            get();
+        }, 10000);
+
+
+    </script>
+</body>
+
+</html>

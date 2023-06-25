@@ -14,9 +14,10 @@ namespace PingAlarm.Monitor
 
             var section = configuration.GetSection("GpioGuard");
 
-            Guards = section.GetSection("Guards").Get<List<GpioInputPin>>();
+            
             Enabled = section.GetValue<bool>("Enabled");
             Sleep = section.GetValue<int>("Sleep");
+            Guards = section.GetSection("Guards").Get<List<GpioInputPin>>();
         }
 
         public List<GpioInputPin> Guards { get; }

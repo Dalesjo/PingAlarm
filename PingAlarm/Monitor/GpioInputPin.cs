@@ -8,15 +8,17 @@ namespace PingAlarm.Monitor
 {
     public class GpioInputPin
     {
-        public string Name { get; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
-        public int Pin { get; }
+        public int Pin { get; set; }
 
-        public bool PullUp { get; }
+        public bool PullUp { get; set; }
 
-        public bool High { get; }
+        public bool High { get; set; }
 
-        public int Verify { get; }
+        public int Verify { get; set; } = 0;
+
+        public int Failures { get; set; } = 0;
 
     }
 }

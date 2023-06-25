@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PingAlarm.Alarms;
 using PingAlarm.Contract;
+using PingAlarm.Monitor;
 
 namespace PingAlarm.Controller
 {
@@ -12,13 +13,21 @@ namespace PingAlarm.Controller
         private readonly ILogger<AlarmController> _log;
         private readonly Alarm _alarm;
 
+        private GpioGuardConfig _gpioconfig;
+        private PingConfig _pingConfig;
+
         public AlarmController(
             Alarm alarm,
-            ILogger<AlarmController> log
+            ILogger<AlarmController> log,
+            PingConfig pingConfig,
+            GpioGuardConfig gpioConfig
             )
         {
             _log = log;
             _alarm = alarm;
+
+            _gpioconfig = gpioConfig;
+            _pingConfig = pingConfig;
 
         }
 
@@ -30,11 +39,7 @@ namespace PingAlarm.Controller
 
             var successfull = _alarm.Set(alarmSet.Enabled, alarmSet.Password);
 
-            var result = new AlarmStatus()
-            {
-                Enabled = _alarm.Enabled,
-                Changed = _alarm.Changed
-            };
+            var result = getAlarmStatus();
 
             if (successfull)
             {
@@ -46,6 +51,42 @@ namespace PingAlarm.Controller
 
             _log.LogInformation("Alarm could not be set, wrong password.");
             return Unauthorized(result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult Get()
+        {
+            var result = getAlarmStatus();
+            return Ok(result);
+        }
+
+        private AlarmStatus getAlarmStatus()
+        {
+            var result = new AlarmStatus()
+            {
+                Enabled = _alarm.Enabled,
+                Changed = _alarm.Changed
+            };
+
+            result.PingHostStatus = _pingConfig.Hosts
+                .OrderBy(host => host.Name)
+                .Select(host => new PingHostStatus
+            {
+                Name = host.Name,
+                Failures = host.Failures
+            }).ToList();
+
+            result.GpioInputPinStatus = _gpioconfig.Guards
+                .OrderBy(host => host.Name)
+                .Select(host => new GpioInputPinStatus()
+                {
+                    Name = host.Name,
+                    Failures= host.Failures
+                }).ToList();
+
+
+            return result;
         }
     }
 }

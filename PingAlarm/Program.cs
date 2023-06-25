@@ -45,37 +45,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 app.MapControllers();
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+await app.RunAsync();
 
 
 
-app.Run();
-
-
-
-
-
-
-var host = WebHost.CreateDefaultBuilder(args)
-    .ConfigureLogging((hostContext, logging) =>
-    {
-        logging.ClearProviders();
-        logging.AddNLog();
-    })
-    .ConfigureServices(services =>
-    {
-        services.AddSingleton<PingConfig>();
-        services.AddSingleton<GpioGuardConfig>();
-        services.AddSingleton<GpioStatusConfig>();
-        services.AddSingleton<TwillioConfig>();
-
-        services.AddSingleton<TwillioAlarm>();
-        services.AddSingleton<GpioStatus>();
-        services.AddSingleton<Alarm>();
-
-        services.AddHostedService<PingWorker>();
-        services.AddHostedService<GpioGuardWorker>();
-
-    })
-    .Build();
-
-await host.RunAsync();

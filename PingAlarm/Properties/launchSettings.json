@@ -5,7 +5,8 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       },
-      "dotnetRunMessages": true
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://0.0.0.0:5000"
     },
     "Docker": {
       "commandName": "Docker"
