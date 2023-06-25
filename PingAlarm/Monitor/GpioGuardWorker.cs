@@ -88,6 +88,7 @@ namespace PingAlarm.Monitor
 
             if(state == verifiedState)
             {
+                _log.LogInformation("Alarm Gpio Pin {gpioPin}", gpioPin.Pin);
                 await _alarm.Start(gpioPin.Name, cancellationToken);
             }
         }

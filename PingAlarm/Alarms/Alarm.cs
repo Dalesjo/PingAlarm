@@ -15,7 +15,7 @@ namespace PingAlarm.Alarms
         private readonly AlarmConfig _alarmConfig;
         private bool Active { get; set; }
 
-        public bool Enabled { get; private set; } = false;
+        public bool Enabled { get; private set; } = true;
 
         public DateTimeOffset Changed { get; private set; } = DateTimeOffset.Now;
 
