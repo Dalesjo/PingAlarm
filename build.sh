@@ -2,7 +2,7 @@
 
 if output=$(git status --porcelain) && [ -n "$output" ]; then
   echo "You have uncommited changes"
-  #exit 3
+  exit 3
 fi
 
 # New Version number
@@ -25,5 +25,5 @@ tar -czvf ./../../../../../../images/PingAlarm-${VERSION}.tar.gz *
 
 cd ./../../../../../../
 
-#git commit -m "Built new Version ${VERSION}"
-#git push
+git commit -m "Built new Version ${VERSION}"
+git push
