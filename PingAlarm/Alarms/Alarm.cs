@@ -50,6 +50,7 @@ namespace PingAlarm.Alarms
             var gpio = _gpioStatus.Alarm(cancellationToken);
 
             await Task.WhenAll(twillio,gpio);
+            _log.LogDebug("Alarm did not wait?");
             Active = false;
         }
 
