@@ -48,7 +48,6 @@ namespace PingAlarm.Alarms
         {
             if (!_gpioConfig.Enabled)
             {
-                _log.LogWarning("GpioStatus is not enabled in appsettings.json");
                 return;
             }
 
@@ -77,7 +76,6 @@ namespace PingAlarm.Alarms
         {
             if (!_gpioConfig.Enabled)
             {
-                _log.LogWarning("GpioStatus is not enabled in appsettings.json");
                 return;
             }
 
@@ -93,7 +91,6 @@ namespace PingAlarm.Alarms
         {
             if (!_gpioConfig.Enabled)
             {
-                _log.LogWarning("GpioStatus is not enabled in appsettings.json");
                 return;
             }
 
