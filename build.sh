@@ -21,9 +21,9 @@ echo "Commiting changes"
 git add ./PingAlarm/PingAlarm.csproj
 
 cd ./../../../../../
-cd PingAlarm/bin/Release/net6.0/linux-arm64/publish/
-tar -czvf ./../../../../../../images/PingAlarm-${VERSION}.tar.gz *
-cd ./../../../../../../
+cd PingAlarm/bin/Release/net6.0/publish/
+tar -czvf ./../../../../../images/PingAlarm-${VERSION}.tar.gz *
+cd ./../../../../../
 
 git commit -m "Built new Version ${VERSION}"
 git push
