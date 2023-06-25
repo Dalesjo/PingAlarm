@@ -20,7 +20,6 @@ dotnet publish -c Release PingAlarm/PingAlarm.csproj
 echo "Commiting changes"
 git add ./PingAlarm/PingAlarm.csproj
 
-cd ./../../../../../
 cd PingAlarm/bin/Release/net6.0/publish/
 tar -czvf ./../../../../../images/PingAlarm-${VERSION}.tar.gz *
 cd ./../../../../../
