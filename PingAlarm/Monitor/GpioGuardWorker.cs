@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Device.Gpio;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,18 +20,21 @@ namespace PingAlarm.Monitor
         private GpioGuardConfig _gpioconfig;
         private GpioController _gpioController;
         private GpioStatus _gpioStatus;
+        private Alarm _alarm;
 
         public GpioGuardWorker(
             GpioGuardConfig gpioConfig,
             ILogger<GpioGuardWorker> log,
-            GpioStatus gpioStatus
+            GpioStatus gpioStatus,
+            Alarm alarm
             )
         {
             _gpioconfig = gpioConfig;
             _gpioStatus = gpioStatus;
             _log = log;
+            _alarm = alarm;
 
-            if(!_gpioconfig.Enabled)
+            if (!_gpioconfig.Enabled)
             {
                 return;
             }
@@ -83,8 +87,7 @@ namespace PingAlarm.Monitor
 
             if(state == verifiedState)
             {
-                /* Alarm */
-
+                await _alarm.Start(gpioPin.Name, cancellationToken);
             }
         }
 

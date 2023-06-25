@@ -82,6 +82,7 @@ namespace PingAlarm.Alarms
             var on = _gpioConfig.NetworkStatus.High ? PinValue.High : PinValue.Low;
             var off = _gpioConfig.NetworkStatus.High ? PinValue.Low : PinValue.High;
             var set = NetworkBlinky ? on : off;
+            _log.LogDebug("NetworkBlinky Blink: {set}", set);
 
             _gpioController.Write(_gpioConfig.NetworkStatus.Pin, set);
             NetworkBlinky = !NetworkBlinky;
@@ -94,9 +95,12 @@ namespace PingAlarm.Alarms
                 return;
             }
 
+            
+
             var on = _gpioConfig.GuardStatus.High ? PinValue.High : PinValue.Low;
             var off = _gpioConfig.GuardStatus.High ? PinValue.Low : PinValue.High;
             var set = GuardBlinky ? on : off;
+            _log.LogDebug("Guard Blink: {set}", set);
 
             _gpioController.Write(_gpioConfig.GuardStatus.Pin, set);
             GuardBlinky = !GuardBlinky;
