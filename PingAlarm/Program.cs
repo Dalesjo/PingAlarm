@@ -8,6 +8,9 @@ using System.Reflection.PortableExecutable;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Enable Linux support
+builder.Host.UseSystemd();
+
 // NLog: Setup NLog for Dependency injection
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
