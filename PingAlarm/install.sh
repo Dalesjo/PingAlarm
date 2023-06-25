@@ -10,9 +10,13 @@ echo "test"
 echo $SCRIPTDIR
 echo $EXECUTABLE
 
+# make binary executable (required)
 chmod +x $EXECUTABLE
 
-cat << EOF | sudo tee /etc/systemd/system/PingAlarm.service
+# enable PingAlarm to create network sockets (needed for ping)
+sudo setcap cap_net_raw+ep PingAlarm
+
+cat << EOF | sudo tee /etc/systemd/system/ping-alarm.service
 [Unit]
 Description="PingAlarm from  https://github.com/Dalesjo/PingAlarm"
 
@@ -29,6 +33,6 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable PingAlarm
-sudo systemctl start PingAlarm
-sudo systemctl status PingAlarm
+sudo systemctl enable ping-alarm
+sudo systemctl start ping-alarm
+sudo systemctl status ping-alarm
