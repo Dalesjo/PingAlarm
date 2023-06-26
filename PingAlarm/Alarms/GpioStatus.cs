@@ -123,6 +123,7 @@ namespace PingAlarm.Alarms
 
         private void OnApplicationStopping()
         {
+            _log.LogInformation("OnApplicationStopping called, cleaning up.");
             TurnOffAllPins();
             _gpioController.ClosePin(_gpioConfig.Alarm.Pin);
             _gpioController.ClosePin(_gpioConfig.NetworkStatus.Pin);
