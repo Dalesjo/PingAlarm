@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Device.Gpio;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,6 +43,20 @@ namespace PingAlarm.Alarms
             _gpioController.OpenPin(_gpioConfig.Alarm.Pin, PinMode.Output);
             _gpioController.OpenPin(_gpioConfig.NetworkStatus.Pin, PinMode.Output);
             _gpioController.OpenPin(_gpioConfig.GuardStatus.Pin,PinMode.Output);
+
+            TurnOffAllPins();
+        }
+
+        private void TurnOffAllPins()
+        {
+            var AlarmOff = getPinValue(_gpioConfig.Alarm, false);
+            _gpioController.Write(_gpioConfig.Alarm.Pin, AlarmOff);
+
+            var networkOff = getPinValue(_gpioConfig.NetworkStatus, false);
+            _gpioController.Write(_gpioConfig.NetworkStatus.Pin, networkOff);
+
+            var GuardOff = getPinValue(_gpioConfig.GuardStatus, false);
+            _gpioController.Write(_gpioConfig.GuardStatus.Pin, GuardOff);
         }
 
         public async Task Alarm(CancellationToken cancellationToken)
@@ -57,12 +72,10 @@ namespace PingAlarm.Alarms
                 return;
             }
 
-
-            var on = _gpioConfig.Alarm.High ? PinValue.High : PinValue.Low;
-            var off = _gpioConfig.Alarm.High ? PinValue.Low : PinValue.High;
-
+            var set = getPinValue(_gpioConfig.Alarm, true);
             AlarmStarted = true;
-            _gpioController.Write(_gpioConfig.Alarm.Pin, on);
+
+            _gpioController.Write(_gpioConfig.Alarm.Pin, set);
             _log.LogDebug("Alarm Started");
             _log.LogDebug("Alarm will run for {AlarmTime}ms",_gpioConfig.AlarmTime);
             
@@ -80,9 +93,7 @@ namespace PingAlarm.Alarms
                 return;
             }
 
-            var on = _gpioConfig.NetworkStatus.High ? PinValue.High : PinValue.Low;
-            var off = _gpioConfig.NetworkStatus.High ? PinValue.Low : PinValue.High;
-            var set = NetworkBlinky ? on : off;
+            var set = getPinValue(_gpioConfig.NetworkStatus, NetworkBlinky);
             _log.LogDebug("NetworkBlinky Blink: {set}", set);
 
             _gpioController.Write(_gpioConfig.NetworkStatus.Pin, set);
@@ -96,17 +107,23 @@ namespace PingAlarm.Alarms
                 return;
             }
 
-            var on = _gpioConfig.GuardStatus.High ? PinValue.High : PinValue.Low;
-            var off = _gpioConfig.GuardStatus.High ? PinValue.Low : PinValue.High;
-            var set = GuardBlinky ? on : off;
+            var set = getPinValue(_gpioConfig.GuardStatus, GuardBlinky);
             _log.LogDebug("Guard Blink: {set}", set);
 
             _gpioController.Write(_gpioConfig.GuardStatus.Pin, set);
             GuardBlinky = !GuardBlinky;
         }
 
+        private PinValue getPinValue(GpioOutputPin gpioOutputPin, bool onOff)
+        {
+            var on = gpioOutputPin.High ? PinValue.High : PinValue.Low;
+            var off = gpioOutputPin.High ? PinValue.Low : PinValue.High;
+            return onOff ? on : off;
+        }
+
         private void OnApplicationStopping()
         {
+            TurnOffAllPins();
             _gpioController.ClosePin(_gpioConfig.Alarm.Pin);
             _gpioController.ClosePin(_gpioConfig.NetworkStatus.Pin);
             _gpioController.ClosePin(_gpioConfig.GuardStatus.Pin);
