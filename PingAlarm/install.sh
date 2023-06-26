@@ -15,6 +15,7 @@ chmod +x $EXECUTABLE
 
 # enable PingAlarm to create network sockets (needed for ping)
 sudo setcap cap_net_raw+ep PingAlarm
+sudo setcap 'cap_net_bind_service=+ep' PingAlarm
 
 cat << EOF | sudo tee /etc/systemd/system/ping-alarm.service
 [Unit]
