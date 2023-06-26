@@ -72,10 +72,11 @@ namespace PingAlarm.Alarms
                 return;
             }
 
-            var set = getPinValue(_gpioConfig.Alarm, true);
+            var on = getPinValue(_gpioConfig.Alarm, true);
+            var off = getPinValue(_gpioConfig.Alarm, false);
             AlarmStarted = true;
 
-            _gpioController.Write(_gpioConfig.Alarm.Pin, set);
+            _gpioController.Write(_gpioConfig.Alarm.Pin, on);
             _log.LogDebug("Alarm Started");
             _log.LogDebug("Alarm will run for {AlarmTime}ms",_gpioConfig.AlarmTime);
             
