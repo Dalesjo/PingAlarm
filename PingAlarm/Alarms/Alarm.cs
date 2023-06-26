@@ -63,6 +63,9 @@ namespace PingAlarm.Alarms
 
             Enabled = onOff;
             Changed = DateTimeOffset.Now;
+
+            _gpioStatus.TurnOffAllPins();
+
             return true;
         }
     }

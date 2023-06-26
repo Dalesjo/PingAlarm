@@ -47,8 +47,15 @@ namespace PingAlarm.Alarms
             TurnOffAllPins();
         }
 
-        private void TurnOffAllPins()
+        public void TurnOffAllPins()
         {
+            if (!_gpioConfig.Enabled)
+            {
+                return;
+            }
+
+            _log.LogDebug("Disabled all GPIO outputs.");
+
             var AlarmOff = getPinValue(_gpioConfig.Alarm, false);
             _gpioController.Write(_gpioConfig.Alarm.Pin, AlarmOff);
 
