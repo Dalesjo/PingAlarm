@@ -95,12 +95,15 @@
         #lastUpdated {
             margin-top: -1.2em;
             font-size: 0.9em;
+            margin-bottom: 1em;
         }
     </style>
 </head>
 
 <body>
-    <h1 id="Alarm">PingAlarm</h1>
+    <h1 id="Alarm">PingAlarm (<span id="state">off</span>)</h1>
+    <div id="lastUpdated"></div>
+
     <form id="alarmForm">
         <input
             id="password"
@@ -141,20 +144,18 @@
             Warning: Wrong Pin Code
         </div>
 
-        <h1>Status (<span id="state">off</span>)</h1>
-        <div id="lastUpdated"></div>
+        <h2>GPIO (<span id="gpioState">off</span>)</h2>
+        <table id="GpioStatus">
 
+        </table>
 
-        <h2>IP-number</h2>
+        <h2>PING (<span id="pingState">off</span>)</h2>
         <table id="PingStatus">
 
         </table>
 
 
-        <h2>Gpio</h2>
-        <table id="GpioStatus">
 
-        </table>
     </form>
 
     <script type="text/javascript">
@@ -165,6 +166,8 @@
         var alarmForm = document.getElementById("alarmForm");
         var warning = document.getElementById("warning");
         var state = document.getElementById("state");
+        var pingState = document.getElementById("pingState");
+        var gpioState = document.getElementById("gpioState");
         var lastUpdated = document.getElementById("lastUpdated");
 
         var alarmType = document.getElementById("alarmType");
@@ -264,22 +267,34 @@
                 state.innerHTML = "off";
             }
 
-
-            if (!alarmTypeDirty)
+            if (status.gpioEnabled && status.pingEnabled)
             {
-                if (status.gpioEnabled && status.pingEnabled)
+                if (!alarmTypeDirty)
                 {
                     alarmType.selectedIndex = 0;
                 }
-                else if (status.gpioEnabled)
+                gpioState.innerHTML = "on";
+                pingState.innerHTML = "on";
+            }
+            else if (status.gpioEnabled)
+            {
+                if (!alarmTypeDirty)
                 {
                     alarmType.selectedIndex = 1;
                 }
-                else
+                gpioState.innerHTML = "off";
+                pingState.innerHTML = "on";
+            }
+            else
+            {
+                if (!alarmTypeDirty)
                 {
                     alarmType.selectedIndex = 2;
                 }
+                gpioState.innerHTML = "off";
+                pingState.innerHTML = "on";
             }
+
 
             lastUpdated.innerHTML = getTime();
 
