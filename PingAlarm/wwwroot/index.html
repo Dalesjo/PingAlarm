@@ -166,7 +166,9 @@
         var warning = document.getElementById("warning");
         var state = document.getElementById("state");
         var lastUpdated = document.getElementById("lastUpdated");
+
         var alarmType = document.getElementById("alarmType");
+        var alarmTypeDirty = false;
 
         var pingStatus = document.getElementById("PingStatus");
         var gpioStatus = document.getElementById("GpioStatus");
@@ -262,17 +264,21 @@
                 state.innerHTML = "off";
             }
 
-            if (status.gpioEnabled && status.pingEnabled)
+
+            if (!alarmTypeDirty)
             {
-                alarmType.selectedIndex = 0;
-            }
-            else if (status.gpioEnabled)
-            {
-                alarmType.selectedIndex = 1;
-            }
-            else
-            {
-                alarmType.selectedIndex = 2;
+                if (status.gpioEnabled && status.pingEnabled)
+                {
+                    alarmType.selectedIndex = 0;
+                }
+                else if (status.gpioEnabled)
+                {
+                    alarmType.selectedIndex = 1;
+                }
+                else
+                {
+                    alarmType.selectedIndex = 2;
+                }
             }
 
             lastUpdated.innerHTML = getTime();
@@ -341,6 +347,20 @@
             send(password, onOff);
         });
 
+        alarmType.addEventListener("change", function ()
+        {
+            alarmTypeDirty = true;
+        });
+
+        alarmType.addEventListener("mousedown", function ()
+        {
+            alarmTypeDirty = true;
+        });
+
+        alarmType.addEventListener("focus", function ()
+        {
+            alarmTypeDirty = true;
+        });
 
         get();
 
