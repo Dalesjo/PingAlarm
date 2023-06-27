@@ -2,8 +2,7 @@
 {
     public class GpioInputPinStatus
     {
-        public string Name { get; set; } = string.Empty;
-
         public int Failures { get; set; } = 0;
+        public string Name { get; set; } = string.Empty;
     }
 }

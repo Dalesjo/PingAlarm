@@ -1,31 +1,22 @@
-using Microsoft.Extensions.Hosting;
-using PingAlarm.Alarms;
-using System.Net;
+using PingAlarm.Gpio;
 using System.Net.NetworkInformation;
-using System.Threading;
 
-namespace PingAlarm.Monitor
+namespace PingAlarm.Network
 {
     public class PingWorker : BackgroundService
     {
         private readonly ILogger<PingWorker> _log;
 
-        private bool AlarmSent = false;
-        private PingConfig _pingConfig;
-        private Alarm _alarm;
         private GpioStatus _gpioStatus;
-
+        private PingConfig _pingConfig;
         public PingWorker(
             PingConfig pingConfig,
             ILogger<PingWorker> log,
-            Alarm alarm,
             GpioStatus gpioStatus)
         {
             _pingConfig = pingConfig;
             _gpioStatus = gpioStatus;
             _log = log;
-            _alarm = alarm;
-
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,50 +28,13 @@ namespace PingAlarm.Monitor
                     _log.LogDebug("Ping All");
                     _gpioStatus.NetworkBlink();
                     await PingAllHosts();
-                    await VerifyAllHosts(stoppingToken);
                     await Task.Delay(_pingConfig.Sleep, stoppingToken);
-                } catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     _log.LogError(ex, "Pinghost Failed");
                 }
             }
-        }
-
-        private async Task VerifyAllHosts(CancellationToken stoppingToken)
-        {
-            var failed = AnyFailedHosts();
-            var failedHosts = GetFailedHosts();
-
-            if (failed == true && AlarmSent == false)
-            {
-                _log.LogInformation("ALARM!!!!!");
-                
-                await _alarm.Start(failedHosts, stoppingToken);
-
-                AlarmSent = true;
-                return;
-            }
-
-            if (failed == false && AlarmSent == true)
-            {
-                _log.LogInformation("ALARM SILENT");
-                AlarmSent = false;
-                return;
-            }
-        }
-
-        private bool AnyFailedHosts()
-        {
-            var alarm = _pingConfig.Hosts.Any(h => h.Failures >= _pingConfig.MinimumFailures);
-
-            return alarm;
-        }
-
-        private string GetFailedHosts()
-        {
-            var failed = _pingConfig.Hosts.Where(h => h.Failures >= _pingConfig.MinimumFailures).Select(h => h.Name);
-
-            return String.Join(',', failed);
         }
 
         private async Task PingAllHosts()

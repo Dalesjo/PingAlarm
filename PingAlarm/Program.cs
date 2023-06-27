@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore;
 using NLog.Extensions.Logging;
 using NLog.Web;
-using PingAlarm.Alarms;
-using PingAlarm.Monitor;
+using PingAlarm.Alarm;
+using PingAlarm.TwillioAlarm;
+using PingAlarm.Gpio;
+using PingAlarm.Network;
 using System.Reflection.PortableExecutable;
 
 
@@ -32,7 +34,7 @@ builder.Services.AddSingleton<TwillioConfig>();
 builder.Services.AddSingleton<TwillioAlarm>();
 
 builder.Services.AddSingleton<AlarmConfig>();
-builder.Services.AddSingleton<Alarm>();
+builder.Services.AddHostedService<AlarmWorker>();
 
 builder.Services.AddSingleton<PingConfig>();
 builder.Services.AddHostedService<PingWorker>();

@@ -1,15 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PingAlarm.Monitor
+﻿namespace PingAlarm.Network
 {
     public class PingConfig
     {
-
         public PingConfig(IConfiguration configuration)
         {
             var config = configuration.GetSection("Ping");
@@ -18,13 +10,9 @@ namespace PingAlarm.Monitor
             Hosts = config.GetSection("Hosts").Get<List<PingHost>>();
         }
 
-        public int Timeout { get; }
-
-        public int Sleep { get; } = 2000;
-
-        public int MinimumFailures { get; } = 2;
-
         public List<PingHost> Hosts { get; set; }
-
+        public int MinimumFailures { get; } = 2;
+        public int Sleep { get; } = 2000;
+        public int Timeout { get; }
     }
 }

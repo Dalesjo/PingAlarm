@@ -1,38 +1,23 @@
-﻿using NLog.Fluent;
-using PingAlarm.Alarms;
-using System;
-using System.Collections.Generic;
-using System.Device.Gpio;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Security.Claims;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Twilio.Jwt.AccessToken;
+﻿using System.Device.Gpio;
 
-namespace PingAlarm.Monitor
+namespace PingAlarm.Gpio
 {
     internal class GpioGuardWorker : BackgroundService
     {
-
         private readonly ILogger<GpioGuardWorker> _log;
         private GpioGuardConfig _gpioconfig;
         private GpioController _gpioController;
         private GpioStatus _gpioStatus;
-        private Alarm _alarm;
 
         public GpioGuardWorker(
             GpioGuardConfig gpioConfig,
             ILogger<GpioGuardWorker> log,
-            GpioStatus gpioStatus,
-            Alarm alarm
+            GpioStatus gpioStatus
             )
         {
             _gpioconfig = gpioConfig;
             _gpioStatus = gpioStatus;
             _log = log;
-            _alarm = alarm;
 
             if (!_gpioconfig.Enabled)
             {
@@ -52,7 +37,7 @@ namespace PingAlarm.Monitor
 
             foreach (var pin in _gpioconfig.Guards)
             {
-                RegistratePin(pin);
+                OpenPin(pin);
             }
 
             while (!cancellationToken.IsCancellationRequested)
@@ -63,53 +48,49 @@ namespace PingAlarm.Monitor
                 {
                     await checkPin(pin, cancellationToken);
                 }
-                
+
                 await Task.Delay(_gpioconfig.Sleep, cancellationToken);
             }
 
             foreach (var pin in _gpioconfig.Guards)
             {
-                UnregisterPin(pin);
+                ClosePin(pin);
             }
         }
 
         private async Task checkPin(GpioInputPin gpioPin, CancellationToken cancellationToken)
         {
-            var state  = _gpioController.Read(gpioPin.Pin);
+            var state = _gpioController.Read(gpioPin.Pin);
             var closed = gpioPin.High ? PinValue.High : PinValue.Low;
 
-            if(state != closed)
+            if (state != closed)
             {
+                gpioPin.Failures = 0;
                 return;
             }
 
             await Task.Delay(gpioPin.Verify, cancellationToken);
             var verifiedState = _gpioController.Read(gpioPin.Pin);
 
-            if(state == verifiedState)
+            if (state == verifiedState)
             {
                 _log.LogInformation("Alarm Gpio Pin {gpioPin}", gpioPin.Pin);
-                await _alarm.Start(gpioPin.Name, cancellationToken);
+                gpioPin.Failures++;
             }
         }
 
-        private void RegistratePin(GpioInputPin gpioPin)
+        private void ClosePin(GpioInputPin gpioPin)
+        {
+            _gpioController.ClosePin(gpioPin.Pin);
+        }
+
+        private void OpenPin(GpioInputPin gpioPin)
         {
             _gpioController.OpenPin(
                 gpioPin.Pin,
                 gpioPin.PullUp ? PinMode.InputPullUp : PinMode.InputPullUp);
 
-             var result = _gpioController.Read(gpioPin.Pin);
-            //result == PinValue.High;
-
             _log.LogDebug("Registrated {gpioPin}", gpioPin.Pin);
-
-        }
-
-        private void UnregisterPin(GpioInputPin gpioPin)
-        {
-
-            _gpioController.ClosePin(gpioPin.Pin);
         }
     }
 }
