@@ -6,5 +6,9 @@
         public bool Enabled { get; set; }
         public List<GpioInputPinStatus> GpioInputPinStatus { get; set; }
         public List<PingHostStatus> PingHostStatus { get; set; }
+
+        public bool GpioEnabled { get; set; }
+
+        public bool PingEnabled { get; set; }
     }
 }

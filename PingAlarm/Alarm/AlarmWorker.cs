@@ -65,8 +65,8 @@ namespace PingAlarm.Alarm
 
         private bool AnyAlarms()
         {
-            var failedPings = _pingConfig.Hosts.Any(h => h.Failures > 0);
-            var failedGpios = _gpioconfig.Guards.Any(h => h.Failures > 0);
+            var failedPings = _pingConfig.Hosts.Any(h => h.Failures > 0) && _pingConfig.Enabled;
+            var failedGpios = _gpioconfig.Guards.Any(h => h.Failures > 0) && _gpioconfig.Enabled;
 
             return failedPings || failedGpios;
         }

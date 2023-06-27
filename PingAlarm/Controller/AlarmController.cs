@@ -44,25 +44,32 @@ namespace PingAlarm.Controller
         {
             var successfull = _alarmConfig.Set(alarmSet.Enabled, alarmSet.Password);
 
-            var result = getAlarmStatus();
+            
 
             if (successfull)
             {
+                _gpioconfig.Enabled = alarmSet.GpioEnabled;
+                _pingConfig.Enabled = alarmSet.PingEnabled;
+                
                 var state = _alarmConfig.Enabled ? "Enabled" : "Disabled";
                 _log.LogInformation("Alarm is {state}", state);
 
+                var result = getAlarmStatus();
                 return Ok(result);
             }
 
             _log.LogInformation("Alarm could not be set, wrong password.");
-            return Unauthorized(result);
+            var defaultResult = getAlarmStatus();
+            return Unauthorized(defaultResult);
         }
         private AlarmStatus getAlarmStatus()
         {
             var result = new AlarmStatus()
             {
                 Enabled = _alarmConfig.Enabled,
-                Changed = _alarmConfig.Changed
+                Changed = _alarmConfig.Changed,
+                GpioEnabled = _gpioconfig.Enabled,
+                PingEnabled = _pingConfig.Enabled,
             };
 
             result.PingHostStatus = _pingConfig.Hosts

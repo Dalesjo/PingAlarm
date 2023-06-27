@@ -11,7 +11,7 @@
             Guards = section.GetSection("Guards").Get<List<GpioInputPin>>();
         }
 
-        public bool Enabled { get; }
+        public bool Enabled { get; set; }
         public List<GpioInputPin> Guards { get; }
         public int Sleep { get; }
     }

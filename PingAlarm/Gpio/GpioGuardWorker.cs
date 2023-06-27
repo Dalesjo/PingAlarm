@@ -19,22 +19,11 @@ namespace PingAlarm.Gpio
             _gpioStatus = gpioStatus;
             _log = log;
 
-            if (!_gpioconfig.Enabled)
-            {
-                return;
-            }
-
             _gpioController = new GpioController();
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (!_gpioconfig.Enabled)
-            {
-                _log.LogInformation("gpioconfig not enabled...");
-                return;
-            }
-
             foreach (var pin in _gpioconfig.Guards)
             {
                 OpenPin(pin);

@@ -21,11 +21,17 @@
             font-size: 1.6em;
         }
 
+        h2 {
+            font-size: 1.2em;
+            margin-block-end: 0em;
+        }
+
         input {
             background-color: #eeeeee;
         }
 
         input,
+        select,
         button {
             display: block;
             box-sizing: border-box;
@@ -33,21 +39,18 @@
             border: 1px solid #333;
             border-radius: 0.2em;
             font-size: 1em;
-        }
-
-        input,
-        button {
             padding: 1em;
             margin-bottom: 1em;
         }
+
 
         .hidden {
             display: none;
         }
 
         table {
-
             width: 100%;
+            margin-top: 0;
             margin-bottom: 0.4em;
             border-collapse: separate;
             border-spacing: 0 1em;
@@ -107,6 +110,12 @@
             autocomplete="off"
         />
 
+        <select id="alarmType">
+            <option value="GPIOPING">GPIO + PING</option>
+            <option value="GPIO">GPIO</option>
+            <option value="PING">PING</option>
+        </select>
+
         <button
             id="enable"
             type="submit"
@@ -134,10 +143,15 @@
 
         <h1>Status (<span id="state">off</span>)</h1>
         <div id="lastUpdated"></div>
+
+
+        <h2>IP-number</h2>
         <table id="PingStatus">
 
         </table>
 
+
+        <h2>Gpio</h2>
         <table id="GpioStatus">
 
         </table>
@@ -152,6 +166,7 @@
         var warning = document.getElementById("warning");
         var state = document.getElementById("state");
         var lastUpdated = document.getElementById("lastUpdated");
+        var alarmType = document.getElementById("alarmType");
 
         var pingStatus = document.getElementById("PingStatus");
         var gpioStatus = document.getElementById("GpioStatus");
@@ -174,9 +189,28 @@
         function send(password, enabled)
         {
 
+            let gpioEnabled = false;
+            let pingEnabled = false;
+
+            if (alarmType.selectedIndex == 0)
+            {
+                gpioEnabled = true;
+                pingEnabled = true;
+            }
+            else if (alarmType.selectedIndex == 1)
+            {
+                gpioEnabled = true;
+            }
+            else
+            {
+                pingEnabled = true;
+            }
+
             let request = {
                 "Password": password,
-                "Enabled": enabled
+                "Enabled": enabled,
+                "gpioEnabled": gpioEnabled,
+                "pingEnabled": pingEnabled
             };
 
             fetch('/api/alarm', {
@@ -226,6 +260,19 @@
                 disable.classList.add("hidden");
                 warning.classList.add("hidden");
                 state.innerHTML = "off";
+            }
+
+            if (status.gpioEnabled && status.pingEnabled)
+            {
+                alarmType.selectedIndex = 0;
+            }
+            else if (status.gpioEnabled)
+            {
+                alarmType.selectedIndex = 1;
+            }
+            else
+            {
+                alarmType.selectedIndex = 2;
             }
 
             lastUpdated.innerHTML = getTime();
