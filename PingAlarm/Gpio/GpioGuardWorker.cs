@@ -31,7 +31,7 @@ namespace PingAlarm.Gpio
         {
             if (!_gpioconfig.Enabled)
             {
-                _log.LogDebug("gpioconfig not enabled...");
+                _log.LogInformation("gpioconfig not enabled...");
                 return;
             }
 

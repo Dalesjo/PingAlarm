@@ -60,7 +60,6 @@ namespace PingAlarm.Alarm
                     continue;
                 }
 
-                StopAlarm();
             }
         }
 
