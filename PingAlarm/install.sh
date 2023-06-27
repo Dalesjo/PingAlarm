@@ -35,5 +35,5 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable ping-alarm
-sudo systemctl start ping-alarm
+sudo systemctl restart ping-alarm
 sudo systemctl status ping-alarm
