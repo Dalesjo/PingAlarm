@@ -5,9 +5,9 @@ namespace PingAlarm.Gpio
     internal class GpioGuardWorker : BackgroundService
     {
         private readonly ILogger<GpioGuardWorker> _log;
-        private GpioGuardConfig _gpioconfig;
-        private GpioController _gpioController;
-        private GpioStatus _gpioStatus;
+        private readonly GpioGuardConfig _gpioconfig;
+        private readonly GpioController _gpioController;
+        private readonly GpioStatus _gpioStatus;
 
         public GpioGuardWorker(
             GpioGuardConfig gpioConfig,
@@ -35,7 +35,7 @@ namespace PingAlarm.Gpio
 
                 foreach (var pin in _gpioconfig.Guards)
                 {
-                    await checkPin(pin, cancellationToken);
+                    await CheckPin(pin, cancellationToken);
                 }
 
                 await Task.Delay(_gpioconfig.Sleep, cancellationToken);
@@ -47,7 +47,7 @@ namespace PingAlarm.Gpio
             }
         }
 
-        private async Task checkPin(GpioInputPin gpioPin, CancellationToken cancellationToken)
+        private async Task CheckPin(GpioInputPin gpioPin, CancellationToken cancellationToken)
         {
             var state = _gpioController.Read(gpioPin.Pin);
             var closed = gpioPin.High ? PinValue.High : PinValue.Low;

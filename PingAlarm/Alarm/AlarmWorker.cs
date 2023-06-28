@@ -11,11 +11,10 @@ namespace PingAlarm.Alarm
         private readonly ILogger<GpioGuardWorker> _log;
 
         private readonly PingConfig _pingConfig;
-        private GpioStatus _gpioStatus;
-        private Stopwatch _stopwatch = new Stopwatch();
-        private TwillioAlarm.TwillioAlarm _twillioAlarm;
+        private readonly GpioStatus _gpioStatus;
+        private readonly Stopwatch _stopwatch = new();
+        private readonly TwillioAlarm.TwillioAlarm _twillioAlarm;
         private bool Active;
-        private string activeAlarm;
         public AlarmWorker(
             ILogger<GpioGuardWorker> log,
             AlarmConfig alarmConfig,
@@ -37,11 +36,11 @@ namespace PingAlarm.Alarm
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, cancellationToken);
 
                 if (Active && !_alarmConfig.Enabled)
                 {
-                    _log.LogInformation("Alarm is disabled", activeAlarm);
+                    _log.LogInformation("Alarm is disabled");
                     StopAlarm();
                     continue;
                 }
@@ -77,7 +76,7 @@ namespace PingAlarm.Alarm
             StopAlarm();
             await Task.Delay(_alarmConfig.Cooldown, cancellationToken);
         }
-        private string getAlarms()
+        private string GetAlarms()
         {
             var failedPings = _pingConfig.Hosts.Where(h => h.Failures > 0).Select(h => h.Name);
             var failedGpios = _gpioconfig.Guards.Where(h => h.Failures > 0).Select(h => h.Name);
@@ -87,8 +86,10 @@ namespace PingAlarm.Alarm
 
         private async Task StartAlarm()
         {
-            var alarms = getAlarms();
+            var alarms = GetAlarms();
             _log.LogInformation("Alarm activated for {alarms}", alarms);
+
+            _gpioStatus.AlarmOn();
 
             if (!Active)
             {
@@ -97,7 +98,7 @@ namespace PingAlarm.Alarm
             }
 
             Active = true;
-            _gpioStatus.AlarmOn();
+            
         }
 
         private void StopAlarm()

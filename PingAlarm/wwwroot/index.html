@@ -182,7 +182,7 @@
                 .then(response => response.json())
                 .then(result =>
                 {
-                    status(result);
+                    updateStatus(result);
                 })
                 .catch(error =>
                 {
@@ -237,7 +237,7 @@
                 .then(result =>
                 {
                     // Handle the response from the API
-                    status(result);
+                    updateStatus(result);
                 })
                 .catch(error =>
                 {
@@ -247,7 +247,7 @@
                 });
         }
 
-        function status(status)
+        function updateStatus(status)
         {
             console.log("status", status.enabled);
             if (status.enabled)

@@ -4,10 +4,9 @@ namespace PingAlarm.Gpio
 {
     public class GpioStatus
     {
-        private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly GpioStatusConfig _gpioConfig;
         private readonly ILogger<GpioStatus> _log;
-        private GpioController _gpioController;
+        private readonly GpioController? _gpioController;
 
         public GpioStatus(
             GpioStatusConfig gpioConfig,
@@ -16,7 +15,6 @@ namespace PingAlarm.Gpio
         {
             _gpioConfig = gpioConfig;
             _log = log;
-            _applicationLifetime = applicationLifetime;
 
             if (!_gpioConfig.Enabled)
             {
@@ -34,18 +32,17 @@ namespace PingAlarm.Gpio
             TurnOffAllPins();
         }
 
-        private bool AlarmStarted { get; set; } = false;
         private bool GuardBlinky { get; set; } = true;
         private bool NetworkBlinky { get; set; } = true;
 
         public void AlarmOff()
         {
-            if (!_gpioConfig.Enabled)
+            if (_gpioController == null)
             {
                 return;
             }
 
-            var off = getPinValue(_gpioConfig.Alarm, false);
+            var off = GetPinValue(_gpioConfig.Alarm, false);
             _gpioController.Write(_gpioConfig.Alarm.Pin, off);
 
             _log.LogDebug("Alarm Started");
@@ -53,12 +50,12 @@ namespace PingAlarm.Gpio
 
         public void AlarmOn()
         {
-            if (!_gpioConfig.Enabled)
+            if (_gpioController == null)
             {
                 return;
             }
 
-            var on = getPinValue(_gpioConfig.Alarm, true);
+            var on = GetPinValue(_gpioConfig.Alarm, true);
             _gpioController.Write(_gpioConfig.Alarm.Pin, on);
 
             _log.LogDebug("Alarm Started");
@@ -66,12 +63,12 @@ namespace PingAlarm.Gpio
 
         public void GuardBlink()
         {
-            if (!_gpioConfig.Enabled)
+            if (_gpioController == null)
             {
                 return;
             }
 
-            var set = getPinValue(_gpioConfig.GuardStatus, GuardBlinky);
+            var set = GetPinValue(_gpioConfig.GuardStatus, GuardBlinky);
             _log.LogDebug("Guard Blink: {set}", set);
 
             _gpioController.Write(_gpioConfig.GuardStatus.Pin, set);
@@ -80,12 +77,12 @@ namespace PingAlarm.Gpio
 
         public void NetworkBlink()
         {
-            if (!_gpioConfig.Enabled)
+            if (_gpioController == null)
             {
                 return;
             }
 
-            var set = getPinValue(_gpioConfig.NetworkStatus, NetworkBlinky);
+            var set = GetPinValue(_gpioConfig.NetworkStatus, NetworkBlinky);
             _log.LogDebug("NetworkBlinky Blink: {set}", set);
 
             _gpioController.Write(_gpioConfig.NetworkStatus.Pin, set);
@@ -94,24 +91,24 @@ namespace PingAlarm.Gpio
 
         public void TurnOffAllPins()
         {
-            if (!_gpioConfig.Enabled)
+            if (_gpioController == null)
             {
                 return;
             }
 
             _log.LogDebug("Disabled all GPIO outputs.");
 
-            var AlarmOff = getPinValue(_gpioConfig.Alarm, false);
+            var AlarmOff = GetPinValue(_gpioConfig.Alarm, false);
             _gpioController.Write(_gpioConfig.Alarm.Pin, AlarmOff);
 
-            var networkOff = getPinValue(_gpioConfig.NetworkStatus, false);
+            var networkOff = GetPinValue(_gpioConfig.NetworkStatus, false);
             _gpioController.Write(_gpioConfig.NetworkStatus.Pin, networkOff);
 
-            var GuardOff = getPinValue(_gpioConfig.GuardStatus, false);
+            var GuardOff = GetPinValue(_gpioConfig.GuardStatus, false);
             _gpioController.Write(_gpioConfig.GuardStatus.Pin, GuardOff);
         }
 
-        private PinValue getPinValue(GpioOutputPin gpioOutputPin, bool onOff)
+        private static PinValue GetPinValue(GpioOutputPin gpioOutputPin, bool onOff)
         {
             var on = gpioOutputPin.High ? PinValue.High : PinValue.Low;
             var off = gpioOutputPin.High ? PinValue.Low : PinValue.High;
@@ -120,6 +117,11 @@ namespace PingAlarm.Gpio
 
         private void OnApplicationStopping()
         {
+            if(_gpioController == null)
+            {
+                return;
+            }
+            
             _log.LogInformation("Applications topping, turning off all LEDs.");
             TurnOffAllPins();
             _gpioController.ClosePin(_gpioConfig.Alarm.Pin);

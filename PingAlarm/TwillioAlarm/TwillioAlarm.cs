@@ -6,7 +6,7 @@ namespace PingAlarm.TwillioAlarm
     public class TwillioAlarm
     {
         private readonly ILogger<TwillioAlarm> _log;
-        private TwillioConfig _twillioConfig;
+        private readonly TwillioConfig _twillioConfig;
 
         public TwillioAlarm(
             TwillioConfig twillioConfig,

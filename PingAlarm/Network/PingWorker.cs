@@ -7,8 +7,8 @@ namespace PingAlarm.Network
     {
         private readonly ILogger<PingWorker> _log;
 
-        private GpioStatus _gpioStatus;
-        private PingConfig _pingConfig;
+        private readonly GpioStatus _gpioStatus;
+        private readonly PingConfig _pingConfig;
         public PingWorker(
             PingConfig pingConfig,
             ILogger<PingWorker> log,
