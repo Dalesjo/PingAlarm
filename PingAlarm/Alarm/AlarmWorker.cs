@@ -53,7 +53,7 @@ namespace PingAlarm.Alarm
                 }
 
                 var isAlarming = AnyAlarms();
-                if (isAlarming)
+                if (_alarmConfig.Enabled && isAlarming)
                 {
                     /* Start alarm */
                     await StartAlarm();
