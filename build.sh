@@ -22,7 +22,7 @@ git add ./PingAlarm/PingAlarm.csproj
 cd PingAlarm/bin/Release/net6.0/linux-arm64/publish/
 rm appsettings.Development.json
 mv appsettings.json appsettings.json.bak
-tar -czvf ./../../../../../../images/PingAlarm-${VERSION}.tar.gz *
+tar -czf ./../../../../../../images/PingAlarm-${VERSION}.tar.gz *
 
 cd ./../../../../../../
 
