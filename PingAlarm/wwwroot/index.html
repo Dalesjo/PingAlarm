@@ -238,6 +238,8 @@
                 {
                     // Handle the response from the API
                     updateStatus(result);
+
+                    document.getElementById("password").value = "";
                 })
                 .catch(error =>
                 {
@@ -301,8 +303,6 @@
             updateTable(pingStatus, status.pingHostStatus);
             updateTable(gpioStatus, status.gpioInputPinStatus);
 
-
-            document.getElementById("password").value = "";
             //document.getElementById("password").focus();
         }
 
