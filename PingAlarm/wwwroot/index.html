@@ -269,6 +269,23 @@
                 state.innerHTML = "off";
             }
 
+            setOnOff(status);
+
+            lastUpdated.innerHTML = getTime();
+
+            updateTable(pingStatus, status.pingHostStatus);
+            updateTable(gpioStatus, status.gpioInputPinStatus);
+        }
+
+        function setOnOff(status)
+        {
+            if (!status.enabled)
+            {
+                gpioState.innerHTML = "off";
+                pingState.innerHTML = "off";
+                return;
+            }
+
             if (status.gpioEnabled && status.pingEnabled)
             {
                 if (!alarmTypeDirty)
@@ -296,13 +313,8 @@
                 gpioState.innerHTML = "off";
                 pingState.innerHTML = "on";
             }
-
-
-            lastUpdated.innerHTML = getTime();
-
-            updateTable(pingStatus, status.pingHostStatus);
-            updateTable(gpioStatus, status.gpioInputPinStatus);
         }
+
 
         function updateTable(table, list)
         {
