@@ -1,9 +1,9 @@
-﻿#!/bin/bash
+#!/bin/bash
 
-SCRIPTDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-EXECUTABLE=${SCRIPTDIR}/PingAlarm;
-USERNAME=`id -un`
-GROUPNAME=`id -gn`
+SCRIPTDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+EXECUTABLE=${SCRIPTDIR}/PingAlarm
+USERNAME=$(id -un)
+GROUPNAME=$(id -gn)
 
 echo "test"
 
@@ -17,7 +17,7 @@ chmod +x $EXECUTABLE
 sudo setcap cap_net_raw+ep PingAlarm
 sudo setcap 'cap_net_bind_service=+ep' PingAlarm
 
-cat << EOF | sudo tee /etc/systemd/system/ping-alarm.service
+cat <<EOF | sudo tee /etc/systemd/system/ping-alarm.service
 [Unit]
 Description="PingAlarm from  https://github.com/Dalesjo/PingAlarm"
 
