@@ -52,13 +52,13 @@ namespace PingAlarm.Controller
                 _pingConfig.Enabled = alarmSet.PingEnabled;
                 
                 var state = _alarmConfig.Enabled ? "Enabled" : "Disabled";
-                _log.LogInformation("Alarm is {state}", state);
+                _log.LogInformation("API: Alarm is set to {state}", state);
 
                 var result = GetAlarmStatus();
                 return Ok(result);
             }
 
-            _log.LogInformation("Alarm could not be set, wrong password.");
+            _log.LogInformation("API: Alarm could not be set, wrong password.");
             var defaultResult = GetAlarmStatus();
             return Unauthorized(defaultResult);
         }

@@ -122,7 +122,7 @@ namespace PingAlarm.Gpio
                 return;
             }
             
-            _log.LogInformation("Applications topping, turning off all LEDs.");
+            _log.LogDebug("Application stopping, turning off all LEDs.");
             TurnOffAllPins();
             _gpioController.ClosePin(_gpioConfig.Alarm.Pin);
             _gpioController.ClosePin(_gpioConfig.NetworkStatus.Pin);

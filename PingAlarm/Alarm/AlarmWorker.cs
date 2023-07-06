@@ -8,7 +8,7 @@ namespace PingAlarm.Alarm
     {
         private readonly AlarmConfig _alarmConfig;
         private readonly GpioGuardConfig _gpioconfig;
-        private readonly ILogger<GpioGuardWorker> _log;
+        private readonly ILogger<AlarmWorker> _log;
 
         private readonly PingConfig _pingConfig;
         private readonly GpioStatus _gpioStatus;
@@ -16,7 +16,7 @@ namespace PingAlarm.Alarm
         private readonly TwillioAlarm.TwillioAlarm _twillioAlarm;
         private bool Active;
         public AlarmWorker(
-            ILogger<GpioGuardWorker> log,
+            ILogger<AlarmWorker> log,
             AlarmConfig alarmConfig,
             GpioGuardConfig gpioConfig,
             PingConfig pingConfig,
@@ -40,7 +40,7 @@ namespace PingAlarm.Alarm
 
                 if (Active && !_alarmConfig.Enabled)
                 {
-                    _log.LogInformation("Alarm is disabled");
+                    _log.LogInformation("Alarm was disabled, turning of alarms.");
                     StopAlarm();
                     continue;
                 }
@@ -64,8 +64,8 @@ namespace PingAlarm.Alarm
 
         private bool AnyAlarms()
         {
-            var failedPings = _pingConfig.Hosts.Any(h => h.Failures > 0) && _pingConfig.Enabled;
-            var failedGpios = _gpioconfig.Guards.Any(h => h.Failures > 0) && _gpioconfig.Enabled;
+            var failedPings = _pingConfig.Hosts.Any(h => h.Failures >= h.MinimumFailures) && _pingConfig.Enabled;
+            var failedGpios = _gpioconfig.Guards.Any(h => h.Failures >= h.MinimumFailures) && _gpioconfig.Enabled;
 
             return failedPings || failedGpios;
         }
@@ -78,8 +78,8 @@ namespace PingAlarm.Alarm
         }
         private string GetAlarms()
         {
-            var failedPings = _pingConfig.Hosts.Where(h => h.Failures > 0).Select(h => h.Name);
-            var failedGpios = _gpioconfig.Guards.Where(h => h.Failures > 0).Select(h => h.Name);
+            var failedPings = _pingConfig.Hosts.Where(h => h.Failures >= h.MinimumFailures).Select(h => h.Name);
+            var failedGpios = _gpioconfig.Guards.Where(h => h.Failures >= h.MinimumFailures).Select(h => h.Name);
 
             return string.Join(",", failedPings) + "," + string.Join(",", failedGpios);
         }

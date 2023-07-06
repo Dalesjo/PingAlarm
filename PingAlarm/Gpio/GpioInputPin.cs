@@ -10,5 +10,8 @@
 
         public bool PullUp { get; set; }
         public int Verify { get; set; } = 0;
+
+        public int MinimumFailures { get; set; } = 1;
+
     }
 }

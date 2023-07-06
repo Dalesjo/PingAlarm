@@ -1,4 +1,5 @@
-﻿using System.Device.Gpio;
+﻿using Microsoft.Extensions.Hosting;
+using System.Device.Gpio;
 
 namespace PingAlarm.Gpio
 {
@@ -63,7 +64,7 @@ namespace PingAlarm.Gpio
 
             if (state == verifiedState)
             {
-                _log.LogInformation("Alarm Gpio Pin {gpioPin}", gpioPin.Pin);
+                _log.LogDebug("Alarm failed for the {Failures}th time for GPIO {gpioPin}", gpioPin.Failures, gpioPin.Pin);
                 gpioPin.Failures++;
             }
         }

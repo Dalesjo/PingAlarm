@@ -13,7 +13,6 @@
 
         public bool Enabled { get; set; } 
         public List<PingHost> Hosts { get; set; }
-        public int MinimumFailures { get; } = 2;
         public int Sleep { get; } = 2000;
         public int Timeout { get; }
     }

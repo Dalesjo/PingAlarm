@@ -66,7 +66,7 @@ namespace PingAlarm.Network
             }
 
             host.Failures++;
-            _log.LogDebug("Ping Failed for the {Failures}th time for {IPNumber}", host.Failures, host.IPNumber);
+            _log.LogDebug("Alarm failed for the {Failures}th time for PING {IPNumber}", host.Failures, host.IPNumber);
         }
     }
 }
